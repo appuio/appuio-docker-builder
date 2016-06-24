@@ -59,3 +59,5 @@ fi
 if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
   docker push "${TAG}"
 fi
+
+sleep 300
