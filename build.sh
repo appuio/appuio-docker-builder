@@ -41,7 +41,7 @@ fi
     env
 	EOF
 
-  ssh builder@buildvm1.beta.puzzle.cust.vshn.net 'cd vagrant && vagrant ssh default -c "docker --version"'
+  ssh -OUserKnownHostsFile=/dev/null -OStrictHostKeyChecking=no builder@buildvm1.beta.puzzle.cust.vshn.net 'cd vagrant && vagrant ssh default -c "docker --version"'
 
   BUILD_DIR=$(mktemp --directory)
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
