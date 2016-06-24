@@ -9,6 +9,8 @@ if [ ! -e "${DOCKER_SOCKET}" ]; then
   exit 1
 fi
 
+echo "APPUiO Docker Builder"
+
 if [ -n "${OUTPUT_IMAGE}" ]; then
   TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
 fi
