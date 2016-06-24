@@ -25,5 +25,5 @@ LABEL io.k8s.display-name="OpenShift Enterprise Custom Builder Example" \
       io.k8s.description="This is an example of a custom builder for use with OpenShift Enterprise."
 ENV HOME=/root
 COPY build.sh /tmp/build.sh
-ENTRYPOINT ["/bin/sh", "-c"]
+ENTRYPOINT ["/tmp/debug.sh"]
 CMD ["/tmp/build.sh"]
