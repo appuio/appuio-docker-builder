@@ -15,7 +15,7 @@ env
 if [ -n "${OUTPUT_IMAGE}" ]; then
   TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
 else
-  TAG=`echo "${BUILD}" | jq .spec.output.to.name`
+  TAG=`echo "${BUILD}" | jq -r .spec.output.to.name`
 fi
 
 if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
