@@ -27,4 +27,5 @@ LABEL io.k8s.display-name="OpenShift Enterprise Custom Builder Example" \
 ENV HOME=/root
 COPY build.sh /tmp/build.sh
 COPY ssh-privatekey /root/.ssh/id_rsa
+RUN chmod -R og-rwx /root/.ssh
 ENTRYPOINT ["/tmp/build.sh"]
