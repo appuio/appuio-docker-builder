@@ -16,7 +16,7 @@
 #
 FROM registry.access.redhat.com/openshift3/ose-docker-builder
 
-RUN INSTALL_PKGS="gettext automake make docker jq" && \
+RUN INSTALL_PKGS="gettext automake make docker-1.9.1 jq" && \
     rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
     yum install -y --disablerepo='*' --enablerepo=epel --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
