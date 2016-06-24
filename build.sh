@@ -33,15 +33,13 @@ if [ -n "${SOURCE_REF}" ]; then
   SOURCE_REF=master
 fi
 
-  ssh -T builder@buildvm1.beta.puzzle.cust.vshn.net ssh default <<-EOF
+  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -T builder@buildvm1.beta.puzzle.cust.vshn.net ssh default <<-EOF
     set -a
 		`env`
     set +a
 
     env
 	EOF
-
-  ssh -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking=no builder@buildvm1.beta.puzzle.cust.vshn.net 'cd vagrant && vagrant ssh default -c "docker --version"'
 
   BUILD_DIR=$(mktemp --directory)
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
