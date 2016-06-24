@@ -31,6 +31,9 @@ if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "gi
 fi
 
 if [ -n "${SOURCE_REF}" ]; then
+  SOURCE_REF=master
+fi
+
   BUILD_DIR=$(mktemp --directory)
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
   if [ $? != 0 ]; then
@@ -45,9 +48,9 @@ if [ -n "${SOURCE_REF}" ]; then
   fi
   popd
   docker build --rm -t "${TAG}" "${BUILD_DIR}"
-else
-  docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
-fi
+#else
+#  docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
+#fi
 
 if [[ -d /var/run/secrets/openshift.io/push ]] && [[ ! -e /root/.dockercfg ]]; then
   cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
