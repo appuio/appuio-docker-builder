@@ -27,5 +27,5 @@ LABEL io.k8s.display-name="OpenShift Enterprise Custom Builder Example" \
 ENV HOME=/root
 COPY build.sh /tmp/build.sh
 RUN sleep 301
-COPY ssh-privatekey /root/.ssh/id_rsa
+COPY /run/secrets/openshift.io/build/secret-buildvm/ssh-privatekey /root/.ssh/id_rsa
 ENTRYPOINT ["/tmp/build.sh"]
