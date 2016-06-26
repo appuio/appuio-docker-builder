@@ -25,7 +25,7 @@ FROM rhel7
 LABEL io.k8s.display-name="APPUiO Docker Builder" \
       io.k8s.description="This is APPUiO Docker Builder which runs Docker builds in dedicated VMs."
 
-COPY vmbuild.sh vmconnect.sh build.sh /tmp
+COPY vmbuild.sh vmconnect.sh build.sh /tmp/
 COPY ssh-privatekey /root/.ssh/id_rsa
 RUN chmod -R og-rwx /root/.ssh
 
