@@ -16,10 +16,10 @@
 #
 FROM rhel7
 
-RUN INSTALL_PKGS="bash openssh-clients" && \
-    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum clean all
+#RUN INSTALL_PKGS="bash openssh-clients" && \
+#    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
+#    rpm -V $INSTALL_PKGS && \
+#    yum clean all
 
 #    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
 
@@ -28,6 +28,6 @@ LABEL io.k8s.display-name="APPUiO Docker Builder" \
 
 COPY vmbuild.sh vmconnect.sh build.sh /tmp/
 COPY ssh-privatekey /root/.ssh/id_rsa
-RUN chmod -R og-rwx /root/.ssh; chmod +x /tmp/vmconnect.sh
+RUN chmod -R og-rwx /root/.ssh; chmod +x /tmp/*.sh
 
 ENTRYPOINT ["/tmp/vmbuild.sh"]
