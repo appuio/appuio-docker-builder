@@ -5,18 +5,16 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 {
   cat <<-EOF
     rm -f /root/.dockercfg
-		(cd / && tar xvf -)
+		(cd / && tar xf -)
 	EOF
-  (cd /; tar cf - tmp/build.sh run/secrets root/.dockercfg)
+  [ -e /root/.dockercfg ] && EXTRA_FILES="/root/.dockercfg"
+  (cd /; tar cf - tmp/build.sh run/secrets ${EXTRA_FILES})
   cat <<-EOF
-		# trap 'rm -rf /run/secrets' EXIT
+		trap 'rm -rf /run/secrets' EXIT
 
 		`export -p`
 
     cd /root
-
-    env
-
 		/tmp/build.sh
 	EOF
 } | ${SCRIPT_DIR}/vmconnect.sh
