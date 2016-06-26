@@ -33,15 +33,8 @@ if [ -n "${SOURCE_REF}" ]; then
   SOURCE_REF=master
 fi
 
-  ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -T builder@buildvm1.beta.puzzle.cust.vshn.net ssh default <<-EOF
-    set -a
-		`env`
-    set +a
-
-    env
-	EOF
-
   BUILD_DIR=$(mktemp --directory)
+  trap 'rm -rf ${BUILD_DIR}' EXIT
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
   if [ $? != 0 ]; then
     echo "Error trying to fetch git source: ${SOURCE_REPOSITORY}"

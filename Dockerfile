@@ -14,18 +14,19 @@
 #
 # The standard name for this image is openshift/ose-custom-docker-builder
 #
-FROM registry.access.redhat.com/openshift3/ose-docker-builder
+FROM rhel7
 
-RUN INSTALL_PKGS="gettext automake make docker-1.9.1 jq" && \
-    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum install -y --disablerepo='*' --enablerepo=epel --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum clean all
+#RUN INSTALL_PKGS="gettext automake make docker-1.9.1 jq" && \
+#    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
+#    yum install -y --disablerepo='*' --enablerepo=epel --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
+#    rpm -V $INSTALL_PKGS && \
+#    yum clean all
 
-LABEL io.k8s.display-name="OpenShift Enterprise Custom Builder Example" \
-      io.k8s.description="This is an example of a custom builder for use with OpenShift Enterprise."
-ENV HOME=/root
-COPY build.sh /tmp/build.sh
+LABEL io.k8s.display-name="APPUiO Docker Builder" \
+      io.k8s.description="This is APPUiO Docker Builder which runs Docker builds in dedicated VMs."
+
+COPY vmbuild.sh vmconnect.sh build.sh /tmp
 COPY ssh-privatekey /root/.ssh/id_rsa
 RUN chmod -R og-rwx /root/.ssh
-ENTRYPOINT ["/tmp/build.sh"]
+
+ENTRYPOINT ["/tmp/vmbuild.sh"]
