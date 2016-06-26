@@ -8,7 +8,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 	EOF
   (cd /; tar cf - tmp/build.sh run/secrets)
   cat <<-EOF
-		trap 'rm -rf /run/secrets' EXIT
+		# trap 'rm -rf /run/secrets' EXIT
 
 		`export -p`
 
