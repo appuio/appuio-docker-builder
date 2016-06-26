@@ -16,11 +16,12 @@
 #
 FROM rhel7
 
-#RUN INSTALL_PKGS="gettext automake make docker-1.9.1 jq" && \
+RUN INSTALL_PKGS="bash openssh-clients" && \
+    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all
+
 #    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-#    yum install -y --disablerepo='*' --enablerepo=epel --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
-#    rpm -V $INSTALL_PKGS && \
-#    yum clean all
 
 LABEL io.k8s.display-name="APPUiO Docker Builder" \
       io.k8s.description="This is APPUiO Docker Builder which runs Docker builds in dedicated VMs."
