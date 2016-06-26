@@ -12,6 +12,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 		`export -p`
 
+    cd /root
+
     env
 
 		/tmp/build.sh
