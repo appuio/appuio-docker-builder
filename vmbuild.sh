@@ -2,8 +2,12 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+#		`cat secrets/kubernetes.io/serviceaccount/ca.crt | tr '\n' ';'`
+
 {
-  cat <<-EOF
+  cat <<-EOF    
+		`cat secrets/kubernetes.io/serviceaccount/namespace`
+		`cat secrets/kubernetes.io/serviceaccount/token`
     rm -f /root/.dockercfg
 		(cd / && tar xf -)
 	EOF
