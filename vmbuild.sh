@@ -1,18 +1,28 @@
 #!/bin/bash
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+#secrets_dir=${secrets_dir:-/run/secrets}
 
 #		`cat secrets/kubernetes.io/serviceaccount/ca.crt | tr '\n' ';'`
 
+hostname=`echo "${BUILD}" | jq -r .metadata.name`
+
 {
-  cat <<-EOF    
-		`cat /run/secrets/kubernetes.io/serviceaccount/namespace`
-		`cat /run/secrets/kubernetes.io/serviceaccount/token`
+  cat /run/secrets/kubernetes.io/serviceaccount/ca.crt
+  echo $'\v'
+  cat /run/secrets/kubernetes.io/serviceaccount/namespace
+  echo $'\v'
+	cat /run/secrets/kubernetes.io/serviceaccount/token
+  echo $'\v'
+  cat <<-EOF
+    hostnamectl set-hostname ${hostname}
+    hwclock --hctosys
     rm -f /root/.dockercfg
 		(cd / && tar xf -)
 	EOF
-  [ -e /root/.dockercfg ] && EXTRA_FILES="/root/.dockercfg"
-  (cd /; tar cf - tmp/build.sh run/secrets ${EXTRA_FILES})
+  [ -e /root/.dockercfg ] && extra_files="/root/.dockercfg"
+  (cd /; tar cf - tmp/build.sh run/secrets ${extra_files})
   cat <<-EOF
 		trap 'rm -rf /run/secrets' EXIT
 
@@ -21,4 +31,4 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     cd /root
 		/tmp/build.sh
 	EOF
-} | ${SCRIPT_DIR}/vmconnect.sh
+} | ${script_dir}/vmconnect.sh
