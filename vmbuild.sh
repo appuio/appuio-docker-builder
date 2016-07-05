@@ -8,6 +8,8 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 hostname=`echo "${BUILD}" | jq -r .metadata.name`
 
+env
+
 {
   cat /run/secrets/kubernetes.io/serviceaccount/ca.crt
   echo $'\v'
@@ -16,9 +18,9 @@ hostname=`echo "${BUILD}" | jq -r .metadata.name`
 	cat /run/secrets/kubernetes.io/serviceaccount/token
   echo $'\v'
   cat <<-EOF
-    hostnamectl set-hostname ${hostname}
-    hwclock --hctosys
-    rm -f /root/.dockercfg
+		hostnamectl set-hostname ${hostname}
+		hwclock --hctosys
+		rm -f /root/.dockercfg
 		(cd / && tar xf -)
 	EOF
   [ -e /root/.dockercfg ] && extra_files="/root/.dockercfg"
