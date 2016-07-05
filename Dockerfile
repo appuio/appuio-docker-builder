@@ -16,10 +16,10 @@
 #
 FROM registry.access.redhat.com/rhel7:latest
 
-#RUN INSTALL_PKGS="bash openssh-clients" && \
-#    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
-#    rpm -V $INSTALL_PKGS && \
-#    yum clean all
+RUN INSTALL_PKGS="bash openssh-clients" && \
+    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all
 
 #    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
 
