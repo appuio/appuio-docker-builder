@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e -o pipefail
+
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #secrets_dir=${secrets_dir:-/run/secrets}

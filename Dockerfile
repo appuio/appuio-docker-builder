@@ -16,7 +16,7 @@
 #
 FROM registry.access.redhat.com/rhel7:latest
 
-RUN INSTALL_PKGS="bash openssh-clients" && \
+RUN INSTALL_PKGS="bash tar openssh-clients" && \
     yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all
