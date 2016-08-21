@@ -16,11 +16,12 @@
 #
 FROM registry.access.redhat.com/rhel7:latest
 
-RUN INSTALL_PKGS="bash tar openssh-clients jq" && \
-    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms --enablerepo=epel $INSTALL_PKGS && \
+RUN INSTALL_PKGS="bash tar openssh-clients" && \
+    yum install -y --disablerepo='*' --enablerepo=rhel-7-server-rpms --enablerepo=rhel-7-server-extras-rpms --enablerepo=rhel-7-server-optional-rpms $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
     yum clean all
+
+#    rpm -ihv https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
 
 LABEL io.k8s.display-name="APPUiO Docker Builder" \
       io.k8s.description="This is APPUiO Docker Builder which runs Docker builds in dedicated VMs."
@@ -28,7 +29,8 @@ LABEL io.k8s.display-name="APPUiO Docker Builder" \
 ENV HOME=/root
 
 COPY vmbuild.sh vmconnect.sh build.sh /tmp/
-COPY ssh-privatekey /root/.ssh/id_rsa
+COPY ida-rsa /root/.ssh/id_rsa
+COPY known-hosts /root/.ssh/known_hosts
 RUN chmod -R og-rwx /root/.ssh; chmod +x /tmp/*.sh
 
 ENTRYPOINT ["/tmp/vmbuild.sh"]
