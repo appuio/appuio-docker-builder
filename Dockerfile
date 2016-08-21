@@ -29,7 +29,7 @@ LABEL io.k8s.display-name="APPUiO Docker Builder" \
 ENV HOME=/root
 
 COPY vmbuild.sh vmconnect.sh build.sh /tmp/
-COPY ida-rsa /root/.ssh/id_rsa
+COPY id-rsa /root/.ssh/id_rsa
 COPY known-hosts /root/.ssh/known_hosts
 RUN chmod -R og-rwx /root/.ssh; chmod +x /tmp/*.sh
 
