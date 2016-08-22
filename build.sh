@@ -17,6 +17,9 @@ else
   TAG=`echo "${BUILD}" | jq -r .spec.output.to.name`
 fi
 
+INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
+DOCKERFILE_PATH=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.dockerFilePath // Dockerfile'`
+
 if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
   URL="${SOURCE_REPOSITORY}"
   if [[ "${URL}" != "http://"* ]] && [[ "${URL}" != "https://"* ]]; then
@@ -33,8 +36,9 @@ if [ -n "${SOURCE_REF}" ]; then
   SOURCE_REF=master
 fi
 
-  BUILD_DIR=$(mktemp --directory)
-  trap 'rm -rf ${BUILD_DIR}' EXIT
+BUILD_DIR=$(mktemp --directory)
+trap 'rm -rf ${BUILD_DIR}' EXIT
+if [ -n "${SOURCE_REPOSITORY}" ]; then
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
   if [ $? != 0 ]; then
     echo "Error trying to fetch git source: ${SOURCE_REPOSITORY}"
@@ -47,10 +51,13 @@ fi
     exit 1
   fi
   popd
-  docker build --rm -t "${TAG}" "${BUILD_DIR}"
-#else
-#  docker build --rm -t "${TAG}" "${SOURCE_REPOSITORY}"
-#fi
+fi
+
+if [ -n "${INLINE_DOCKERFILE}" ]; then
+  echo -e "${INLINE_DOCKERFILE}" >"${BUILD_DIR}/${DOCKERFILE_PATH}"
+fi
+
+docker build --rm -t "${TAG}" -f "${BUILD_DIR}/${DOCKERFILE_PATH}" "${BUILD_DIR}"
 
 if [[ -d /var/run/secrets/openshift.io/push ]] && [[ ! -e /root/.dockercfg ]]; then
   cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
