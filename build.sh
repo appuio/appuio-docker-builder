@@ -18,7 +18,8 @@ else
 fi
 
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
-DOCKERFILE_PATH=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.dockerFilePath // Dockerfile'`
+DOCKERFILE_PATH=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.dockerFilePath // "Dockerfile"'`
+SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[].secret.name'`
 
 if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
   URL="${SOURCE_REPOSITORY}"
@@ -54,8 +55,13 @@ if [ -n "${SOURCE_REPOSITORY}" ]; then
 fi
 
 if [ -n "${INLINE_DOCKERFILE}" ]; then
-  echo -e "${INLINE_DOCKERFILE}" >"${BUILD_DIR}/${DOCKERFILE_PATH}"
+  echo -e "${INLINE_DOCKERFILE}" >"${BUILD_DIR}/Dockerfile"
 fi
+
+for SECRET in ${SECRET_NAMES}; do
+  DESTINATION_DIR=`echo "$BUILD" | jq '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "./"'`
+  cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${BUILD}/${DESTINATION_DIR}"
+done
 
 docker build --rm -t "${TAG}" -f "${BUILD_DIR}/${DOCKERFILE_PATH}" "${BUILD_DIR}"
 
