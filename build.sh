@@ -59,7 +59,7 @@ if [ -n "${INLINE_DOCKERFILE}" ]; then
 fi
 
 for SECRET in ${SECRET_NAMES}; do
-  DESTINATION_DIR=`echo "$BUILD" | jq '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "./"'`
+  DESTINATION_DIR=`echo "$BUILD" | jq -r '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "./"'`
   cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${BUILD_DIR}/${DESTINATION_DIR}"
 done
 
