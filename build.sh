@@ -2,6 +2,10 @@
 set -e -o pipefail
 IFS=$'\n\t'
 
+env
+
+set -x
+
 DOCKER_SOCKET=/var/run/docker.sock
 
 if [ ! -e "${DOCKER_SOCKET}" ]; then
