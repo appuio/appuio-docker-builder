@@ -25,17 +25,17 @@ INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
 DOCKERFILE_PATH=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.dockerFilePath // "Dockerfile"'`
 SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
 
-if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
-  URL="${SOURCE_REPOSITORY}"
-  if [[ "${URL}" != "http://"* ]] && [[ "${URL}" != "https://"* ]]; then
-    URL="https://${URL}"
-  fi
-  curl --head --silent --fail --location --max-time 16 $URL > /dev/null
-  if [ $? != 0 ]; then
-    echo "Could not access source url: ${SOURCE_REPOSITORY}"
-    exit 1
-  fi
-fi
+#if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
+#  URL="${SOURCE_REPOSITORY}"
+#  if [[ "${URL}" != "http://"* ]] && [[ "${URL}" != "https://"* ]]; then
+#    URL="https://${URL}"
+#  fi
+#  curl --head --silent --fail --location --max-time 16 $URL > /dev/null
+#  if [ $? != 0 ]; then
+#    echo "Could not access source url: ${SOURCE_REPOSITORY}"
+#    exit 1
+#  fi
+#fi
 
 if [ -n "${SOURCE_REF}" ]; then
   SOURCE_REF=master
