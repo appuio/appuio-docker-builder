@@ -22,7 +22,7 @@ else
 fi
 
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
-DOCKERFILE_PATH=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.dockerFilePath // "Dockerfile"'`
+DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerFilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
 SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
 
 #if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
