@@ -2,9 +2,9 @@
 set -e -o pipefail
 IFS=$'\n\t'
 
-env
+#env
 
-set -x
+#set -x
 
 DOCKER_SOCKET=/var/run/docker.sock
 
@@ -24,6 +24,8 @@ fi
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
 DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerFilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
 SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
+FORCE_PULL=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.forcePull // .spec.strategy.customStrategy.forcePull // "false"'`
+NO_CACHE=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.noCache // \"${NO_CACHE:-false}\""`
 
 #if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
 #  URL="${SOURCE_REPOSITORY}"
@@ -67,7 +69,19 @@ for SECRET in ${SECRET_NAMES}; do
   cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${BUILD_DIR}/${DESTINATION_DIR}"
 done
 
-docker build --rm -t "${TAG}" -f "${BUILD_DIR}/${DOCKERFILE_PATH}" "${BUILD_DIR}"
+DOCKER_ARGS=("build")
+
+if [ "${FORCE_PULL}" == "true" ]; then
+  DOCKER_ARGS+=("--pull")
+fi
+
+if [ "${NO_CACHE}" == "true" ]; then
+  DOCKER_ARGS+=("--no-cache")
+fi
+
+DOCKER_ARGS+=("--rm" "-t" "${TAG}" "-f" "${BUILD_DIR}/${DOCKERFILE_PATH}" "${BUILD_DIR}")
+echo docker "${DOCKER_ARGS[@]}"
+docker "${DOCKER_ARGS[@]}"
 
 if [[ -d /var/run/secrets/openshift.io/push ]] && [[ ! -e /root/.dockercfg ]]; then
   cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg

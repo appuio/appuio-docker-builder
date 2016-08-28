@@ -10,14 +10,27 @@
       "kind": "ImageStream",
       "apiVersion": "v1",
       "metadata": {
-        "name": "appuio-docker-builder",
+        "name": "ose-docker-builder",
         "generation": 1,
         "creationTimestamp": null,
         "labels": {
           "app": "appuio-docker-builder"
-        },
-        "annotations": {
-          "openshift.io/generated-by": "OpenShiftNewApp"
+        }
+      },
+      "spec": {},
+      "status": {
+        "dockerImageRepository": ""
+      }
+    },
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "ose-deployer",
+        "generation": 1,
+        "creationTimestamp": null,
+        "labels": {
+          "app": "appuio-docker-builder"
         }
       },
       "spec": {},
@@ -36,6 +49,53 @@
       },
       "spec": {
         "dockerImageRepository": "registry.access.redhat.com/rhel7"
+      }
+    },
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "ose-deployer",
+        "creationTimestamp": null,
+        "labels": {
+          "app": "appuio-docker-builder"
+        }
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          }
+        ],
+        "source": {
+          "type": "Dockerfile",
+          "dockerfile": "FROM openshift3/ose-deployer:${OPENSHIFT_VERSION}"
+        },
+        "strategy": {
+          "type": "Custom",
+          "customStrategy": {
+            "from": {
+              "kind": "DockerImage",
+              "name": "appuio/appuio-docker-builder:latest"
+            },
+            "exposeDockerSocket": true
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "ose-deployer:${OPENSHIFT_VERSION}"
+          }
+        },
+        "resources": {},
+        "postCommit": {}
+      },
+      "status": {
+        "lastVersion": 0
       }
     },
     {
@@ -87,18 +147,25 @@
           ]
         },
         "strategy": {
-          "type": "Docker",
-          "dockerStrategy": {
+          "type": "Custom",
+          "customStrategy": {
             "from": {
-              "kind": "ImageStreamTag",
-              "name": "rhel7:latest"
-            }
+              "kind": "DockerImage",
+              "name": "appuio/appuio-docker-builder:latest"
+            },
+            "env": [
+              {
+                "name": "DOCKERFILE_PATH",
+                "value": "Dockerfile.secure"
+              }
+            ],
+            "exposeDockerSocket": true
           }
         },
         "output": {
           "to": {
             "kind": "ImageStreamTag",
-            "name": "appuio-docker-builder:latest"
+            "name": "ose-docker-builder:${OPENSHIFT_VERSION}"
           }
         },
         "resources": {},
@@ -107,9 +174,56 @@
       "status": {
         "lastVersion": 0
       }
-    }
+    },
+{
+    "kind": "PolicyBinding",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "openshift:default",
+        "creationTimestamp": null
+    },
+    "lastModified": "2016-08-19T12:37:57Z",
+    "policyRef": {
+        "namespace": "openshift",
+        "name": "default"
+    },
+    "roleBindings": [
+        {
+            "name": "shared-resource-viewers",
+            "roleBinding": {
+                "metadata": {
+                    "name": "shared-resource-viewers",
+                    "namespace": "openshift",
+                    "uid": "c1f7654e-6609-11e6-823d-52540062f6b8",
+                    "resourceVersion": "80",
+                    "creationTimestamp": "2016-08-19T12:37:57Z"
+                },
+                "userNames": null,
+                "groupNames": [
+                    "system:authenticated"
+                ],
+                "subjects": [
+                    {
+                        "kind": "SystemGroup",
+                        "name": "system:authenticated"
+                    }
+                ],
+                "roleRef": {
+                    "namespace": "openshift",
+                    "name": "shared-resource-viewer"
+                }
+            }
+        }
+    ]
+}
+
   ],
   "parameters": [
+    {
+      "description": "OpenShift version",
+      "name": "OPENSHIFT_VERSION",
+      "required": true
+    },
     {
       "description": "GitHub trigger secret",
       "name": "GITHUB_WEBHOOK_SECRET",
