@@ -21,6 +21,7 @@ else
   TAG=`echo "${BUILD}" | jq -r .spec.output.to.name`
 fi
 
+CONTEXT_DIR=`echo "${BUILD}" | jq -r '.spec.source.contextDir // "."'`
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
 DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerFilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
 SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
@@ -44,29 +45,31 @@ if [ -n "${SOURCE_REF}" ]; then
 fi
 
 BUILD_DIR=$(mktemp --directory)
-trap 'rm -rf ${BUILD_DIR}' EXIT
+trap 'cd /tmp; rm -rf ${BUILD_DIR}' EXIT
+
 if [ -n "${SOURCE_REPOSITORY}" ]; then
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
   if [ $? != 0 ]; then
     echo "Error trying to fetch git source: ${SOURCE_REPOSITORY}"
     exit 1
   fi
-  pushd "${BUILD_DIR}"
+  cd "${BUILD_DIR}"
   git checkout "${SOURCE_REF}"
   if [ $? != 0 ]; then
     echo "Error trying to checkout branch: ${SOURCE_REF}"
     exit 1
   fi
-  popd
+else
+  cd "${BUILD_DIR}"
 fi
 
 if [ -n "${INLINE_DOCKERFILE}" ]; then
-  echo -e "${INLINE_DOCKERFILE}" >"${BUILD_DIR}/Dockerfile"
+  echo -e "${INLINE_DOCKERFILE}" >"${CONTEXT_DIR}/Dockerfile"
 fi
 
 for SECRET in ${SECRET_NAMES}; do
-  DESTINATION_DIR=`echo "$BUILD" | jq -r '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "./"'`
-  cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${BUILD_DIR}/${DESTINATION_DIR}"
+  DESTINATION_DIR=`echo "$BUILD" | jq -r '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "."'`
+  cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${CONTEXT_DIR}/${DESTINATION_DIR}"
 done
 
 DOCKER_ARGS=("build")
@@ -79,7 +82,7 @@ if [ "${NO_CACHE}" == "true" ]; then
   DOCKER_ARGS+=("--no-cache")
 fi
 
-DOCKER_ARGS+=("--rm" "-t" "${TAG}" "-f" "${BUILD_DIR}/${DOCKERFILE_PATH}" "${BUILD_DIR}")
+DOCKER_ARGS+=("--rm" "-t" "${TAG}" "-f" "${CONTEXT_DIR}/${DOCKERFILE_PATH}" "${CONTEXT_DIR}")
 echo docker "${DOCKER_ARGS[@]}"
 docker "${DOCKER_ARGS[@]}"
 

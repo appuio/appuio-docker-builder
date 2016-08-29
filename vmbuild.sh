@@ -10,7 +10,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 hostname=`echo "${BUILD}" | jq -r .metadata.name`
 
-env
+# env
 
 {
   cat /run/secrets/kubernetes.io/serviceaccount/ca.crt
