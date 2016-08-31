@@ -10,6 +10,21 @@
       "kind": "ImageStream",
       "apiVersion": "v1",
       "metadata": {
+        "name": "appuio-docker-builder",
+        "generation": 1,
+        "creationTimestamp": null,
+        "labels": {
+          "app": "appuio-docker-builder"
+        }
+      },
+      "spec": {
+        "dockerImageRepository": "appuio/appuio-docker-builder"
+      }
+    },
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
         "name": "ose-docker-builder",
         "generation": 1,
         "creationTimestamp": null,
