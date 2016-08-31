@@ -23,7 +23,7 @@ fi
 
 CONTEXT_DIR=`echo "${BUILD}" | jq -r '.spec.source.contextDir // "."'`
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
-DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerFilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
+DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerfilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
 SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
 FORCE_PULL=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.forcePull // .spec.strategy.customStrategy.forcePull // "false"'`
 NO_CACHE=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.noCache // \"${NO_CACHE:-false}\""`
