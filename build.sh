@@ -59,17 +59,17 @@ if [ -n "${SOURCE_REPOSITORY}" ]; then
     echo "Error trying to checkout branch: ${SOURCE_REF}"
     exit 1
   fi
-else
-  cd "${BUILD_DIR}"
 fi
 
+cd "${BUILD_DIR}/${CONTEXT_DIR}"
+
 if [ -n "${INLINE_DOCKERFILE}" ]; then
-  echo -e "${INLINE_DOCKERFILE}" >"${CONTEXT_DIR}/Dockerfile"
+  echo -e "${INLINE_DOCKERFILE}" >Dockerfile
 fi
 
 for SECRET in ${SECRET_NAMES}; do
   DESTINATION_DIR=`echo "$BUILD" | jq -r '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "."'`
-  cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${CONTEXT_DIR}/${DESTINATION_DIR}"
+  cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${DESTINATION_DIR}"
 done
 
 DOCKER_ARGS=("build")
@@ -82,7 +82,7 @@ if [ "${NO_CACHE}" == "true" ]; then
   DOCKER_ARGS+=("--no-cache")
 fi
 
-DOCKER_ARGS+=("--rm" "-t" "${TAG}" "-f" "${CONTEXT_DIR}/${DOCKERFILE_PATH}" "${CONTEXT_DIR}")
+DOCKER_ARGS+=("--rm" "-t" "${TAG}" "-f" "${DOCKERFILE_PATH}" .)
 echo docker "${DOCKER_ARGS[@]}"
 docker "${DOCKER_ARGS[@]}"
 
