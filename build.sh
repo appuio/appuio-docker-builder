@@ -69,7 +69,7 @@ if [ -n "${INLINE_DOCKERFILE}" ]; then
 fi
 
 if [ -n "${BASE_IMAGE}" ]; then
-  sed -i "s/^FROM.*/${BASE_IMAGE}/" "${DOCKERFILE_PATH}"
+  sed -i "s|^FROM.*|${BASE_IMAGE}|" "${DOCKERFILE_PATH}"
 fi
 
 for SECRET in ${SECRET_NAMES}; do
