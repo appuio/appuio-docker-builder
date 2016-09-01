@@ -21,6 +21,7 @@ else
   TAG=`echo "${BUILD}" | jq -r .spec.output.to.name`
 fi
 
+BASE_IMAGE=`echo "${BUILD}" | jq '.spec.strategy.dockerStrategy.from.name // empty'`
 CONTEXT_DIR=`echo "${BUILD}" | jq -r '.spec.source.contextDir // "."'`
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
 DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerfilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
@@ -65,6 +66,10 @@ cd "${BUILD_DIR}/${CONTEXT_DIR}"
 
 if [ -n "${INLINE_DOCKERFILE}" ]; then
   echo -e "${INLINE_DOCKERFILE}" >Dockerfile
+fi
+
+if [ -n "${BASE_IMAGE}" ]; then
+  sed -i "s/^FROM.*/${BASE_IMAGE}/" "${DOCKERFILE_PATH}"
 fi
 
 for SECRET in ${SECRET_NAMES}; do
