@@ -70,6 +70,7 @@ fi
 
 if [ -n "${BASE_IMAGE}" ]; then
   sed -i "s|^FROM.*|FROM ${BASE_IMAGE}|" "${DOCKERFILE_PATH}"
+  cat "${DOCKERFILE_PATH}"
 fi
 
 for SECRET in ${SECRET_NAMES}; do

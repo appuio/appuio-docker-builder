@@ -21,7 +21,7 @@ hostname=`echo "${BUILD}" | jq -r .metadata.name`
   echo $'\v'
   cat <<-EOF
 		hostnamectl set-hostname ${hostname}
-		hwclock --hctosys
+		# hwclock --hctosys
 		rm -f /root/.dockercfg
 		(cd / && tar xf -)
 	EOF
