@@ -2,10 +2,6 @@
 set -e -o pipefail
 IFS=$'\n\t'
 
-#env
-
-#set -x
-
 DOCKER_SOCKET=/var/run/docker.sock
 
 if [ ! -e "${DOCKER_SOCKET}" ]; then
@@ -21,25 +17,15 @@ else
   TAG=`echo "${BUILD}" | jq -r .spec.output.to.name`
 fi
 
-BASE_IMAGE=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.from.name // empty'`
+# Disabled to work around rhbz#1346167
+# BASE_IMAGE=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.from.name // empty'`
+
 CONTEXT_DIR=`echo "${BUILD}" | jq -r '.spec.source.contextDir // "."'`
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
 DOCKERFILE_PATH=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.dockerfilePath // \"${DOCKERFILE_PATH:-Dockerfile}\""`
 SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
 FORCE_PULL=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.forcePull // .spec.strategy.customStrategy.forcePull // "false"'`
 NO_CACHE=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.noCache // \"${NO_CACHE:-false}\""`
-
-#if [[ "${SOURCE_REPOSITORY}" != "git://"* ]] && [[ "${SOURCE_REPOSITORY}" != "git@"* ]]; then
-#  URL="${SOURCE_REPOSITORY}"
-#  if [[ "${URL}" != "http://"* ]] && [[ "${URL}" != "https://"* ]]; then
-#    URL="https://${URL}"
-#  fi
-#  curl --head --silent --fail --location --max-time 16 $URL > /dev/null
-#  if [ $? != 0 ]; then
-#    echo "Could not access source url: ${SOURCE_REPOSITORY}"
-#    exit 1
-#  fi
-#fi
 
 if [ -n "${SOURCE_REF}" ]; then
   SOURCE_REF=master
