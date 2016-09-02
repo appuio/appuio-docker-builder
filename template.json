@@ -18,7 +18,7 @@
         }
       },
       "spec": {
-        "dockerImageRepository": "appuio/appuio-docker-builder"
+        "dockerImageRepository": "appuio/appuio-docker-builder:latest"
       }
     },
     {
@@ -42,6 +42,22 @@
       "apiVersion": "v1",
       "metadata": {
         "name": "ose-deployer",
+        "generation": 1,
+        "creationTimestamp": null,
+        "labels": {
+          "app": "appuio-docker-builder"
+        }
+      },
+      "spec": {},
+      "status": {
+        "dockerImageRepository": ""
+      }
+    },
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "ose-sti-builder",
         "generation": 1,
         "creationTimestamp": null,
         "labels": {
@@ -97,6 +113,12 @@
               "kind": "DockerImage",
               "name": "appuio/appuio-docker-builder:latest"
             },
+            "env": [
+              {
+                "name": "OPENSHIFT_CUSTOM_BUILD_BASE_IMAGE",
+                "value": "openshift3/ose-deployer:${OPENSHIFT_VERSION}"
+              }
+            ],
             "exposeDockerSocket": true
           }
         },
@@ -104,6 +126,59 @@
           "to": {
             "kind": "ImageStreamTag",
             "name": "ose-deployer:${OPENSHIFT_VERSION}"
+          }
+        },
+        "resources": {},
+        "postCommit": {}
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "ose-sti-builder",
+        "creationTimestamp": null,
+        "labels": {
+          "app": "appuio-docker-builder"
+        }
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          }
+        ],
+        "source": {
+          "type": "Dockerfile",
+          "dockerfile": "FROM openshift3/ose-sti-builder:${OPENSHIFT_VERSION}"
+        },
+        "strategy": {
+          "type": "Custom",
+          "customStrategy": {
+            "from": {
+              "kind": "DockerImage",
+              "name": "appuio/appuio-docker-builder:latest"
+            },
+            "env": [
+              {
+                "name": "OPENSHIFT_CUSTOM_BUILD_BASE_IMAGE",
+                "value": "openshift3/ose-sti-builder:${OPENSHIFT_VERSION}"
+              }
+            ],
+            "exposeDockerSocket": true
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "ose-sti-builder:${OPENSHIFT_VERSION}"
           }
         },
         "resources": {},
@@ -170,6 +245,10 @@
             },
             "env": [
               {
+                "name": "OPENSHIFT_CUSTOM_BUILD_BASE_IMAGE",
+                "value": "rhel7:latest"
+              },
+              {
                 "name": "DOCKERFILE_PATH",
                 "value": "Dockerfile.secure"
               }
@@ -190,48 +269,47 @@
         "lastVersion": 0
       }
     },
-{
-    "kind": "PolicyBinding",
-    "apiVersion": "v1",
-    "metadata": {
+    {
+      "kind": "PolicyBinding",
+      "apiVersion": "v1",
+      "metadata": {
         "name": "openshift:default",
         "creationTimestamp": null
-    },
-    "lastModified": "2016-08-19T12:37:57Z",
-    "policyRef": {
+      },
+      "lastModified": "2016-08-19T12:37:57Z",
+      "policyRef": {
         "namespace": "openshift",
         "name": "default"
-    },
-    "roleBindings": [
+      },
+      "roleBindings": [
         {
-            "name": "shared-resource-viewers",
-            "roleBinding": {
-                "metadata": {
-                    "name": "shared-resource-viewers",
-                    "namespace": "openshift",
-                    "uid": "c1f7654e-6609-11e6-823d-52540062f6b8",
-                    "resourceVersion": "80",
-                    "creationTimestamp": "2016-08-19T12:37:57Z"
-                },
-                "userNames": null,
-                "groupNames": [
-                    "system:authenticated"
-                ],
-                "subjects": [
-                    {
-                        "kind": "SystemGroup",
-                        "name": "system:authenticated"
-                    }
-                ],
-                "roleRef": {
-                    "namespace": "openshift",
-                    "name": "shared-resource-viewer"
-                }
+          "name": "shared-resource-viewers",
+          "roleBinding": {
+            "metadata": {
+              "name": "shared-resource-viewers",
+              "namespace": "openshift",
+              "uid": "c1f7654e-6609-11e6-823d-52540062f6b8",
+              "resourceVersion": "80",
+              "creationTimestamp": "2016-08-19T12:37:57Z"
+            },
+            "userNames": null,
+            "groupNames": [
+              "system:authenticated"
+            ],
+            "subjects": [
+              {
+                "kind": "SystemGroup",
+                "name": "system:authenticated"
+              }
+            ],
+            "roleRef": {
+              "namespace": "openshift",
+              "name": "shared-resource-viewer"
             }
+          }
         }
-    ]
-}
-
+      ]
+    }
   ],
   "parameters": [
     {
