@@ -12,9 +12,9 @@ fi
 echo "APPUiO Docker Builder"
 
 if [ -n "${OUTPUT_IMAGE}" ]; then
-  TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
+  DOCKER_TAG="${OUTPUT_REGISTRY}/${OUTPUT_IMAGE}"
 else
-  TAG=`echo "${BUILD}" | jq -r .spec.output.to.name`
+  DOCKER_TAG=`echo "${BUILD}" | jq -r '.spec.output.to.name // empty'`
 fi
 
 # Disabled to work around rhbz#1346167
@@ -73,7 +73,13 @@ if [ "${NO_CACHE}" == "true" ]; then
   DOCKER_ARGS+=("--no-cache")
 fi
 
-DOCKER_ARGS+=("--rm" "-t" "${TAG}" "-f" "${DOCKERFILE_PATH}" .)
+DOCKER_ARGS+=("--rm" "-t" "${DOCKER_TAG}" "-f" "${DOCKERFILE_PATH}" .)
+
+export DOCKERFILE_PATH DOCKER_TAG DOCKER_ARGS FORCE_PULL NO_CACHE
+if [ -x .d2i/pre_build ]; then
+  .d2i/pre_build "${DOCKERFILE_PATH}" "$DOCKER_TAG"
+fi
+
 echo docker "${DOCKER_ARGS[@]}"
 docker "${DOCKER_ARGS[@]}"
 
@@ -81,6 +87,10 @@ if [[ -d /var/run/secrets/openshift.io/push ]] && [[ ! -e /root/.dockercfg ]]; t
   cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
 fi
 
-if [ -n "${OUTPUT_IMAGE}" ] || [ -s "/root/.dockercfg" ]; then
-  docker push "${TAG}"
+if [ -n "${DOCKER_TAG}" ] || [ -s "/root/.dockercfg" ]; then
+  docker push "${DOCKER_TAG}"
+fi
+
+if [ -x .d2i/post_build ]; then
+  .d2i/post_build
 fi
