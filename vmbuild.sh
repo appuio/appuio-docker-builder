@@ -6,7 +6,7 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 hostname=`echo "${BUILD}" | jq -r .metadata.name`
 
-[ -e /tmp/stderr.log ] || mkfifo /tmp/stderr.log
+[ -e /tmp/stderr ] || mkfifo /tmp/stderr
 
 {
   cat /run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -15,8 +15,7 @@ hostname=`echo "${BUILD}" | jq -r .metadata.name`
   echo -n $'\v'
   cat /run/secrets/kubernetes.io/serviceaccount/token
   echo -n $'\v'
-  # while [ ! -s /tmp/stderr.log ]; do sleep 0.1; done
-  exec 3</tmp/stderr.log
+  exec 3</tmp/stderr
   read allocated port registry_port remote <&3
   read allocated port master_port remote <&3
   cat <&3 >/dev/null &
