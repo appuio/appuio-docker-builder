@@ -32,7 +32,7 @@ if [ -n "${SOURCE_REF}" ]; then
 fi
 
 BUILD_DIR=$(mktemp --directory)
-trap 'cd /tmp; rm -rf ${BUILD_DIR}' EXIT
+trap 'cd /tmp; rm -rf ${BUILD_DIR}' EXIT INT TERM
 
 if [ -n "${SOURCE_REPOSITORY}" ]; then
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"

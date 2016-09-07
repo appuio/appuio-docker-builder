@@ -30,7 +30,7 @@ hostname=`echo "${BUILD}" | jq -r .metadata.name`
   [ -e /root/.dockercfg ] && extra_files="/root/.dockercfg"
   (cd /; tar cf - tmp/build.sh run/secrets ${extra_files})
   cat <<-EOF
-		trap 'rm -rf /run/secrets' EXIT
+		trap 'rm -rf /run/secrets' EXIT INT TERM
 
 		`export -p`
 
