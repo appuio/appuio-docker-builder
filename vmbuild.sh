@@ -4,21 +4,22 @@ set -e -o pipefail
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-#secrets_dir=${secrets_dir:-/run/secrets}
-
-#		`cat secrets/kubernetes.io/serviceaccount/ca.crt | tr '\n' ';'`
-
 hostname=`echo "${BUILD}" | jq -r .metadata.name`
-
-# env
 
 {
   cat /run/secrets/kubernetes.io/serviceaccount/ca.crt
-  echo $'\v'
+  echo -n $'\v'
   cat /run/secrets/kubernetes.io/serviceaccount/namespace
-  echo $'\v'
-	cat /run/secrets/kubernetes.io/serviceaccount/token
-  echo $'\v'
+  echo -n $'\v'
+  cat /run/secrets/kubernetes.io/serviceaccount/token
+  echo -n $'\v'
+  [ -e /tmp/stderr.log ] || mkfifo /tmp/stderr.log
+  # while [ ! -s /tmp/stderr.log ]; do sleep 0.1; done
+  exec 3</tmp/stderr.log
+  read allocated port registry_port remote <&3
+  read allocated port master_port remote <&3
+  cat <&3 >/dev/null &
+  echo -n $registry_port $master_port $'\v'
   cat <<-EOF
 		hostnamectl set-hostname ${hostname}
 		hwclock --hctosys
