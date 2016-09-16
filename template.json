@@ -206,7 +206,7 @@
           {
             "type": "GitHub",
             "github": {
-              "secret": "{GITHUB_WEBHOOK_SECRET}"
+              "secret": "${GITHUB_WEBHOOK_SECRET}"
             }
           },
           {
