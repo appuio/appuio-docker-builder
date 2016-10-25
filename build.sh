@@ -34,6 +34,14 @@ fi
 BUILD_DIR=$(mktemp --directory)
 trap 'cd /tmp; rm -rf ${BUILD_DIR}' EXIT INT TERM
 
+mkdir -p ~/.ssh
+echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null" >> ~/.ssh/config
+
+if [ -e /run/secrets/openshift.io/source/ssh-privatekey ]; then
+  cp -a /run/secrets/openshift.io/source/ssh-privatekey ~/.ssh/id_rsa
+fi
+chmod -R og-rwx ~/.ssh
+
 if [ -n "${SOURCE_REPOSITORY}" ]; then
   git clone --recursive "${SOURCE_REPOSITORY}" "${BUILD_DIR}"
   if [ $? != 0 ]; then

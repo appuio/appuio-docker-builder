@@ -113,6 +113,7 @@
               "kind": "DockerImage",
               "name": "appuio/appuio-docker-builder:latest"
             },
+            "forcePull": true,
             "env": [
               {
                 "name": "OPENSHIFT_CUSTOM_BUILD_BASE_IMAGE",
