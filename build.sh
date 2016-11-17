@@ -27,7 +27,7 @@ SECRET_NAMES=`echo "${BUILD}" | jq -r '.spec.source.secrets[]?.secret.name'`
 FORCE_PULL=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.forcePull // .spec.strategy.customStrategy.forcePull // "false"'`
 NO_CACHE=`echo "${BUILD}" | jq -r ".spec.strategy.dockerStrategy.noCache // \"${NO_CACHE:-false}\""`
 
-if [ -n "${SOURCE_REF}" ]; then
+if [ -z "${SOURCE_REF}" ]; then
   SOURCE_REF=master
 fi
 
