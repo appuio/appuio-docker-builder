@@ -17,8 +17,7 @@ else
   DOCKER_TAG=`echo "${BUILD}" | jq -r '.spec.output.to.name // empty'`
 fi
 
-# Disabled to work around rhbz#1346167
-# BASE_IMAGE=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.from.name // empty'`
+BASE_IMAGE=`echo "${BUILD}" | jq -r '.spec.strategy.dockerStrategy.from.name // empty'`
 
 CONTEXT_DIR=`echo "${BUILD}" | jq -r '.spec.source.contextDir // "."'`
 INLINE_DOCKERFILE=`echo "${BUILD}" | jq -r '.spec.source.dockerfile // empty'`
