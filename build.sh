@@ -38,7 +38,7 @@ mkdir -p ~/.ssh
 echo -e "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null" >> ~/.ssh/config
 
 if [ -e /run/secrets/openshift.io/source/ssh-privatekey ]; then
-  cp -a /run/secrets/openshift.io/source/ssh-privatekey ~/.ssh/id_rsa
+  cp -aL /run/secrets/openshift.io/source/ssh-privatekey ~/.ssh/id_rsa
 fi
 chmod -R og-rwx ~/.ssh
 
@@ -68,7 +68,7 @@ fi
 
 for SECRET in ${SECRET_NAMES}; do
   DESTINATION_DIR=`echo "$BUILD" | jq -r '(.spec.source.secrets[].secret | select(.name == "${SECRET}").destinationDir) // "."'`
-  cp -a /var/run/secrets/openshift.io/build/${SECRET}/* "${DESTINATION_DIR}"
+  cp -aL /var/run/secrets/openshift.io/build/${SECRET}/* "${DESTINATION_DIR}"
 done
 
 DOCKER_ARGS=("build")
@@ -92,7 +92,7 @@ echo docker "${DOCKER_ARGS[@]}"
 docker "${DOCKER_ARGS[@]}"
 
 if [[ -d /var/run/secrets/openshift.io/push ]] && [[ ! -e /root/.dockercfg ]]; then
-  cp /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
+  cp -aL /var/run/secrets/openshift.io/push/.dockercfg /root/.dockercfg
 fi
 
 if [ -n "${DOCKER_TAG}" ] || [ -s "/root/.dockercfg" ]; then
